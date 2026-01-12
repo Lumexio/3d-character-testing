@@ -27,17 +27,12 @@ _global_script_classes=[ {
 "base": "Spatial",
 "class": "MannequinyMeele",
 "language": "GDScript",
-"path": "res://src/Player/MannequinyMeele.gd"
+"path": "res://src/Player/MannequinyMeele/MannequinyMeele.gd"
 }, {
 "base": "KinematicBody",
 "class": "Player",
 "language": "GDScript",
 "path": "res://src/Player/Player.gd"
-}, {
-"base": "Reference",
-"class": "PlayerMeele",
-"language": "GDScript",
-"path": "res://src/Player/PlayerMeele.gd"
 }, {
 "base": "State",
 "class": "PlayerState",
@@ -60,7 +55,6 @@ _global_script_class_icons={
 "Mannequiny": "",
 "MannequinyMeele": "",
 "Player": "",
-"PlayerMeele": "",
 "PlayerState": "",
 "State": "",
 "StateMachine": ""
