@@ -34,6 +34,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://src/Player/Player.gd"
 }, {
+"base": "Reference",
+"class": "PlayerMeele",
+"language": "GDScript",
+"path": "res://src/Player/PlayerMeele.gd"
+}, {
 "base": "State",
 "class": "PlayerState",
 "language": "GDScript",
@@ -55,6 +60,7 @@ _global_script_class_icons={
 "Mannequiny": "",
 "MannequinyMeele": "",
 "Player": "",
+"PlayerMeele": "",
 "PlayerState": "",
 "State": "",
 "StateMachine": ""

@@ -1,7 +1,7 @@
 extends Node
 
 # Default player scene if no choice was made in the main menu
-export(PackedScene) var default_player_scene := preload("res://src/Player/Player.tscn")
+export(PackedScene) var default_player_scene = preload("res://src/Player/Player.tscn")
 
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -25,19 +25,29 @@ func _input(event: InputEvent) -> void:
 
 func _spawn_selected_player() -> void:
 	# Choose player scene: Global.player_scene if set, else default
-	var player_scene := Global.player_scene if Global.player_scene else default_player_scene
+	var player_scene: PackedScene = default_player_scene
+	if Global.player_scene:
+		player_scene = Global.player_scene
 	
-	# Reset Global.player_scene after reading it
 	Global.player_scene = null
 	
 	# Find and remove the existing placeholder Player node
 	var existing_player := get_node_or_null("Player")
 	if existing_player:
-		var spawn_transform := existing_player.global_transform
-		existing_player.queue_free()
-		
-		# Instance the chosen player
-		var new_player := player_scene.instance()
-		new_player.name = "Player"
-		new_player.global_transform = spawn_transform
-		add_child(new_player)
+		# Cast to Spatial so we can use global_transform
+		var existing_spatial := existing_player as Spatial
+		if existing_spatial:
+			var spawn_transform := existing_spatial.global_transform
+			existing_spatial.queue_free()
+			
+			# Instance the chosen player
+			var new_player := player_scene.instance() as Spatial
+			new_player.name = "Player"
+			new_player.global_transform = spawn_transform
+			add_child(new_player)
+		else:
+			# Fallback if Player is not Spatial for some reason
+			existing_player.queue_free()
+			var new_player2 := player_scene.instance()
+			new_player2.name = "Player"
+			add_child(new_player2)

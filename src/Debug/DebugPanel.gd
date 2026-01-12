@@ -1,21 +1,24 @@
 tool
 extends Control
 # Displays the values of properties of a given node
-# You can directly change the `properties` property to display multiple values from the `reference` node
-# E.g. properties = PoolStringArray(['speed', 'position', 'modulate'])
-
 
 export var reference_path: NodePath
 export var properties: PoolStringArray setget set_properties
-export var round_decimals: = 2
+export var round_decimals := 2
 
 onready var _container: VBoxContainer = $VBoxContainer/MarginContainer/VBoxContainer
 onready var _title: Label = $VBoxContainer/ReferenceName
-onready var reference: Node = get_node(reference_path) setget set_reference
+onready var reference: Node = null setget set_reference
 
-var _step: = 1.0 / pow(10, round_decimals)
+var _step := 1.0 / pow(10, round_decimals)
+
 
 func _ready() -> void:
+	if not reference_path.is_empty():
+		# Try to get the initial reference from the path
+		var node := get_node_or_null(reference_path)
+		if node:
+			reference = node
 	if not reference:
 		return
 	_setup()
@@ -27,6 +30,8 @@ func _process(delta) -> void:
 
 func _setup() -> void:
 	_clear()
+	if not is_instance_valid(reference):
+		return
 	_title.text = reference.name
 	for property in properties:
 		track(property)
@@ -37,11 +42,11 @@ func _get_configuration_warning() -> String:
 
 
 func track(property: String) -> void:
-	var label: = Label.new()
+	var label := Label.new()
 	label.autowrap = true
 	label.name = property.capitalize()
 	_container.add_child(label)
-	if not property in properties:
+	if not (property in properties):
 		properties.append(property)
 
 
@@ -53,14 +58,26 @@ func _clear() -> void:
 func _update() -> void:
 	if Engine.editor_hint:
 		return
+
+	# If the reference was freed, try to re-fetch it from the path
+	if not is_instance_valid(reference):
+		if not reference_path.is_empty():
+			var node := get_node_or_null(reference_path)
+			if node:
+				reference = node
+				_setup()
+		# Still nothing valid: nothing to show this frame
+		if not is_instance_valid(reference):
+			return
+
 	var search_array: Array = properties
 	for property in properties:
 		var value = reference.get(property)
 		var label: Label = _container.get_child(search_array.find(property))
-		var text: = ""
+		var text := ""
 		if value is float:
 			text = str(stepify(value, _step))
-		if value is Vector2:
+		elif value is Vector2:
 			text = "(%s %s)" % [
 				stepify(value.x, _step),
 				stepify(value.y, _step)
@@ -82,27 +99,27 @@ func _update() -> void:
 
 func get_vector2_as_string(vector: Vector2) -> String:
 	return "(%s %s)" % [
-				stepify(vector.x, _step),
-				stepify(vector.y, _step)
-			]
+		stepify(vector.x, _step),
+		stepify(vector.y, _step)
+	]
 
 
 func get_vector3_as_string(vector: Vector3) -> String:
 	return "(%s %s %s)" % [
-				stepify(vector.x, _step),
-				stepify(vector.y, _step),
-				stepify(vector.z, _step)
-			]
+		stepify(vector.x, _step),
+		stepify(vector.y, _step),
+		stepify(vector.z, _step)
+	]
 
 
 func set_properties(value: PoolStringArray) -> void:
 	properties = value
-	if not reference:
+	if not is_instance_valid(reference):
 		return
 	_setup()
 
 
 func set_reference(value: Node) -> void:
 	reference = value
-	if reference:
-	  _setup()
+	if is_instance_valid(reference):
+		_setup()
