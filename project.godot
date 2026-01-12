@@ -27,7 +27,7 @@ _global_script_classes=[ {
 "base": "Spatial",
 "class": "MannequinyMeele",
 "language": "GDScript",
-"path": "res://src/Player/MannequinyMeele/MannequinyMeele.gd"
+"path": "res://src/Player/MannequinyMeele/Mannequiny.gd"
 }, {
 "base": "KinematicBody",
 "class": "Player",
